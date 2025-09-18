@@ -2,10 +2,67 @@
 <head>
 <meta charset="utf-8">
 <title>Lab 2 for Web GIS</title>
+<body onload="initialize()">;
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+ html { height:100% }
+ body { height:100%; margin:0; padding:0 }
+ #map_canvas { height:60vh; width:100% }
+</style>
+<script
+ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYNlUSn8KLOLjejpE5FKnwLQr9_mxurIo">
+</script>
+<script>
+ function initialize() 
+{
+ var latlng = new google.maps.LatLng(35.306840, -80.73200);
+ var myOptions = {
+ zoom: 16,
+ center: latlng,
+ mapTypeId: google.maps.MapTypeId.HYBRID
+ };
+ new google.maps.Map(document.getElementById("map_canvas"),
+ myOptions);
+ }
+</script>
+<h3>Interactive Map (Google Maps)</h3>
+<div id="map_canvas" style="width:50%; height:50%"></div>
+</body>
+</html>
 </head>
 <body>
 <h1>Lab 2 for Web GIS</h1>
-<h3> Travis Toomey </h3>
+<h3>Name: Travis T</h3>
 <!-- Comments-->
+<h3>Current Date is: </h3>
+<script type="text/javascript">
+document.write(Date());
+</script>
+<h3>Generate a random number: </h3>
+<script type="text/javascript">
+document.write(Math.floor(Math.random() * 100));
+document.write("<br>");
+
+var str1="Hello World";
+document.write(str1);
+document.write("<br>");
+document.write("<br>");
+var y=10
+var x=5;
+var z=x+y;
+document.write(z);
+document.write("<br>");
+
+function sum3(x1,x2,x3)
+{
+ var sum=x1+x2+x3;
+ 
+ return sum;
+}
+var k=sum3(5,6,7);
+document.write(k);
+</script>
+
+</script>
 </body>
 </html>
