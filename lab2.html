@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,6 +29,35 @@
       mapTypeId: google.maps.MapTypeId.HYBRID
     };
     new google.maps.Map(document.getElementById("map2"), map2);
+    
+    var latlng = new google.maps.LatLng(36.067717227389124, -80.21412310897622);
+    var map3 = {
+      zoom: 20,
+      center: latlng,
+      mapTypeId: google.maps.MapTypeId.SATELLITE
+    };
+    new google.maps.Map(document.getElementById("map3"), map3);
+    
+    var latlng = new google.maps.LatLng(36.252634209074614, -80.36374991499);
+    var map4 = {
+      zoom: 15,
+      center: latlng,
+      mapTypeId: google.maps.MapTypeId.HYBRID
+    };
+    new google.maps.Map(document.getElementById("map4"), map4);
+    
+    var latlng = new google.maps.LatLng(36.34047618725195, -80.47826044050429);
+    var map5 = {
+      zoom: 14,
+      center: latlng,
+      mapTypeId: google.maps.MapTypeId.TERRAIN
+    };
+    new google.maps.Map(document.getElementById("map5"), map5);
+    
+    
+    
+    
+    
   }
 </script>
 </head>
@@ -51,6 +79,12 @@
 <div id="map1" class="map_canvas"> </div>
 <h4> Downtown W-S </h4>
 <div id="map2" class="map_canvas"> </div>
+<h4> Shell Shapped Shell Gas Station </h4>
+<div id="map3" class="map_canvas"></div>
+<h4> RJ Reynolds Factory: Home of Camel Cigarettes</h4>
+<div id="map4" class="map_canvas"></div>
+<h4> Terrain of Pilot Mountain</h4>
+<div id="map5" class="map_canvas"></div>
 
 </body>
 </html>
