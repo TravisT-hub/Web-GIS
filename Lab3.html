@@ -17,23 +17,23 @@
   </head>
 
   <body>
-    <h2>Lab 3 (Q1 + Q2): OpenLayers – OSM and Azure Maps for North Carolina</h2>
-    <h4>Author: Travis Toomey</h4>
+    <h2>Questions 1 and 2: OSM and Azure Maps for North Carolina</h2>
+    <h4>Travis Toomey</h4>
     <div id="map"></div>
 
     <script>
-      // ---- Base Layers ----
+     
       const OSM = new ol.layer.Tile({
-        title: "OpenStreetMap",
+        title: "OSM",
         type: "base",
         visible: true,
         source: new ol.source.OSM(),
       });
 
-      const AZURE_KEY = "6srLl2o3dGC8xAqJVrOEtVGTFj1ujl40lKOoKJD6f1K3XLS2U5JAJQQJ99BIACYeBjFZ86DdAAAgAZMP4fGn";
+      const AZURE_KEY = '6srLl2o3dGC8xAqJVrOEtVGTFj1ujl40lKOoKJD6f1K3XLS2U5JAJQQJ99BIACYeBjFZ86DdAAAgAZMP4fGn';
 
       const azureRoad = new ol.layer.Tile({
-        title: "Azure Maps (Road)",
+        title: "Road",
         type: "base",
         visible: false,
         source: new ol.source.XYZ({
@@ -43,7 +43,7 @@
       });
 
       const azureDark = new ol.layer.Tile({
-        title: "Azure Maps (Dark Gray)",
+        title: "Dark Gray",
         type: "base",
         visible: false,
         source: new ol.source.XYZ({
@@ -77,23 +77,23 @@
         layers: [OSM, azureRoad, azureDark, azureImagery, azureTerra],
       });
 
-      // ---- Map Object ----
+    
       const map = new ol.Map({
         target: "map",
         layers: [baseGroup],
         view: new ol.View({
           projection: "EPSG:3857",
           center: ol.proj.fromLonLat([-79.0193, 35.7596]), // North Carolina center
-          zoom: 7,
+          zoom: 8,
         }),
       });
 
-      // ---- Fit to North Carolina Extent ----
+      
       const ncExtent4326 = [-84.3219, 33.8423, -75.4001, 36.5880];
       const ncExtent3857 = ol.proj.transformExtent(ncExtent4326, "EPSG:4326", "EPSG:3857");
       map.getView().fit(ncExtent3857, { size: map.getSize(), padding: [20, 20, 20, 20], duration: 300 });
 
-      // ---- Layer Switcher ----
+    
       map.addControl(new ol.control.LayerSwitcher({ tipLabel: "Legend" }));
     </script>
   </body>
