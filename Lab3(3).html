@@ -1,1 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Lab 3 - Question 3: North Carolina with WMS Overlay</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/ol@v10.6.1/dist/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.6.1/ol.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol-layerswitcher@4.1.2/dist/ol-layerswitcher.css" />
+    <script src="https://cdn.jsdelivr.net/npm/ol-layerswitcher@4.1.2/dist/ol-layerswitcher.js"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 20px;
+      }
+      #map {
+        width: 90%;
+        height: 600px;
+        margin: auto;
+        border: 2px solid #333;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1> Question 3: North Carolina with WMS Overlay</h1>
+    <h4>By- Travis Toomey</h4>
+    <div id="map"></div>
+
+    <script>
+      // --- Base Map (OSM) ---
+      const OSM = new ol.layer.Tile({
+        title: "OpenStreetMap",
+        type: "base",
+        visible: true,
+        source: new ol.source.OSM(),
+      });
+
+      const wmsLayer = new ol.layer.Tile({
+        title: "WMS: US States (topp:states)",
+        visible: true,
+        source: new ol.source.TileWMS({
+          url: "https://ahocevar.com/geoserver/wms",
+          params: {
+            LAYERS: "topp:states",
+            TILED: true,
+            FORMAT: "image/png",
+            TRANSPARENT: true,
+          },
+          serverType: "geoserver",
+          transition: 0,
+        }),
+      });
+
+      // --- Layer Groups ---
+      const baseGroup = new ol.layer.Group({
+        title: "Base Maps",
+        layers: [OSM],
+      });
+
+      const overlayGroup = new ol.layer.Group({
+        title: "Overlay Layers",
+        layers: [wmsLayer],
+      });
+
+      // --- Map Object ---
+      const map = new ol.Map({
+        target: "map",
+        layers: [baseGroup, overlayGroup],
+        view: new ol.View({
+          projection: "EPSG:3857",
+          center: ol.proj.fromLonLat([-79.0193, 35.7596]), // North Carolina center
+          zoom: 7,
+        }),
+      });
+
+      // --- Fit Map to North Carolina Extent ---
+      const ncExtent4326 = [-84.3219, 33.8423, -75.4001, 36.5880];
+      const ncExtent3857 = ol.proj.transformExtent(ncExtent4326, "EPSG:4326", "EPSG:3857");
+      map.getView().fit(ncExtent3857, { size: map.getSize(), padding: [20, 20, 20, 20], duration: 300 });
+
+
+    </script>
+  </body>
+</html>
 
