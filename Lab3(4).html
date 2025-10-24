@@ -4,11 +4,9 @@
 <meta charset="utf-8" />
 <title>Tasmania Web GIS</title>
 
-<!-- OpenLayers -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.6.1/ol.css" />
 <script src="https://cdn.jsdelivr.net/npm/ol@v10.6.1/dist/ol.js"></script>
 
-<!-- Layer Switcher -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol-layerswitcher@4.1.2/dist/ol-layerswitcher.css" />
 <script src="https://cdn.jsdelivr.net/npm/ol-layerswitcher@4.1.2/dist/ol-layerswitcher.js"></script>
 
@@ -35,22 +33,21 @@
 const AZURE_KEY = 'DbDYQ0y51C4CZpsU7XWCy7KxF9uGfGF4ZjSMDV11yvr1LZehm4I8JQQJ99BJACYeBjFNMnj2AAAgAZMPrefu';
 const wmsUrl = "https://data.stategrowth.tas.gov.au/geoserver/ows";
 
-// Tasmania center
+
 const tasCenter = ol.proj.fromLonLat([146.8, -42.0]);
 
-// Base layer: Azure Road
 const azureRoad = new ol.layer.Tile({
   title: "Azure Maps Road",
   type: "base",
   visible: true,
   source: new ol.source.XYZ({
-    url: `https://atlas.microsoft.com/map/tile?api-version=2022-08-01&tilesetId=microsoft.base.road&zoom={z}&x={x}&y={y}&subscription-key=${AZURE_KEY}`,
+    url: `https://atlas.microsoft.com/map/tile?api-version=2022-08-01&tilesetId=microsoft.imagery.hybrid&zoom={z}&x={x}&y={y}&subscription-key=${AZURE_KEY}`,
     crossOrigin: "anonymous",
     maxZoom: 19
   })
 });
 
-// WMS layers
+
 const carriageways = new ol.layer.Tile({
   title: "Carriageways (WMS)",
   source: new ol.source.TileWMS({
@@ -102,7 +99,7 @@ const busTrips = new ol.layer.Tile({
   visible: false
 });
 
-// Map
+
 const map = new ol.Map({
   target: "map",
   layers: [
@@ -122,5 +119,6 @@ const map = new ol.Map({
 
 </body>
 </html>
+
 
 
