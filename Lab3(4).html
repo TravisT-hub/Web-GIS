@@ -37,7 +37,7 @@ const wmsUrl = "https://data.stategrowth.tas.gov.au/geoserver/ows";
 const tasCenter = ol.proj.fromLonLat([146.8, -42.0]);
 
 const azureRoad = new ol.layer.Tile({
-  title: "Azure Maps Road",
+  title: "Hybrid Base",
   type: "base",
   visible: true,
   source: new ol.source.XYZ({
@@ -49,7 +49,7 @@ const azureRoad = new ol.layer.Tile({
 
 
 const carriageways = new ol.layer.Tile({
-  title: "Carriageways (WMS)",
+  title: "Carriageways",
   source: new ol.source.TileWMS({
     url: wmsUrl,
     params: {
@@ -66,7 +66,7 @@ const carriageways = new ol.layer.Tile({
 });
 
 const cadastre = new ol.layer.Tile({
-  title: "Cadastre Parcels (WMS)",
+  title: "Cadastre Parcels",
   source: new ol.source.TileWMS({
     url: wmsUrl,
     params: {
@@ -83,7 +83,7 @@ const cadastre = new ol.layer.Tile({
 });
 
 const busTrips = new ol.layer.Tile({
-  title: "Bus Trips (WMS)",
+  title: "Bus Trips",
   source: new ol.source.TileWMS({
     url: wmsUrl,
     params: {
