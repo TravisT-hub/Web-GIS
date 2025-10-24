@@ -115,6 +115,7 @@ const map = new ol.Map({
     new LayerSwitcher({ tipLabel: "Layers", groupSelectStyle: "children" })
   ]
 });
+   map.addControl(new ol.control.LayerSwitcher({ tipLabel: "Legend" }));
 </script>
 
 </body>
