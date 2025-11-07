@@ -1,1 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaflet Basemap & WMS App</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; }
+    #controls { padding:10px; background:#f0f0f0; border-bottom:1px solid #ccc; }
+    #map { height:600px; width:100%; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <strong>Basemaps:</strong>
+    <label><input type="radio" name="basemap" value="osm" checked> OSM</label>
+    <label><input type="radio" name="basemap" value="esri"> ESRI Imagery</label>
+
+    &nbsp;&nbsp; <strong>WMS Layers:</strong>
+    <label><input type="checkbox" id="wmsToggle" checked> States WMS</label>
+    <label><input type="checkbox" id="elevationToggle" checked> Elevation WMS</label>
+  </div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // --- Basemaps ---
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    });
+
+    const esri = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri'
+    });
+
+    // --- WMS Layers ---
+    const wms = L.tileLayer.wms('https://ahocevar.com/geoserver/wms', {
+      layers: 'topp:states',
+      format: 'image/png',
+      transparent: true,
+      version: '1.1.1',
+      attribution: 'States &copy; GeoServer'
+    });
+
+    // Use a publicly available elevation WMS (SRTM) instead of Bluemarble
+    const elevation = L.tileLayer.wms('https://ows.terrestris.de/osm/service?', {
+      layers: 'SRTM30-Colored',
+      format: 'image/png',
+      transparent: true,
+      version: '1.1.1',
+      attribution: 'Elevation &copy; terrestris'
+    });
+
+    // --- Map ---
+    const map = L.map('map', {
+      center: [39.5, -98.5], // continental US
+      zoom: 4,
+      layers: [osm, wms, elevation]
+    });
+
+    // --- Basemap Switcher ---
+    document.querySelectorAll('input[name="basemap"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'osm') {
+          map.addLayer(osm);
+          map.removeLayer(esri);
+        } else {
+          map.addLayer(esri);
+          map.removeLayer(osm);
+        }
+      });
+    });
+
+    // --- WMS Toggles ---
+    document.getElementById('wmsToggle').addEventListener('change', function() {
+      if (this.checked) {
+        map.addLayer(wms);
+      } else {
+        map.removeLayer(wms);
+      }
+    });
+
+    document.getElementById('elevationToggle').addEventListener('change', function() {
+      if (this.checked) {
+        map.addLayer(elevation);
+      } else {
+        map.removeLayer(elevation);
+      }
+    });
+  </script>
+</body>
+</html>
 
