@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenLayers Map Viewer</title>
+    
+    <!-- OpenLayers CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+    
+    <!-- Tailwind CSS for styling the controls -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Set html, body, and the map container to full height */
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+            background: #f0f0f0;
+        }
+        /* Ensure OpenLayers attribution is visible on dark basemaps */
+        .ol-attribution {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- The map container -->
+    <div id="map"></div>
+
+    <!-- Control Panel -->
+    <div id="controls" class="absolute top-4 left-4 z-10 bg-white p-4 rounded-lg shadow-md max-w-xs">
+        <div class="grid gap-4">
+            <!-- Basemap Switcher -->
+            <div>
+                <h3 class="font-bold text-gray-800 mb-2">Basemap</h3>
+                <div class="flex items-center space-x-2">
+                    <input type="radio" id="osm" name="basemap" value="osm" class="h-4 w-4 text-blue-600" checked>
+                    <label for="osm" class="text-sm text-gray-700">OpenStreetMap</label>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="radio" id="esri" name="basemap" value="esri" class="h-4 w-4 text-blue-600">
+                    <label for="esri" class="text-sm text-gray-700">ESRI Imagery</label>
+                </div>
+            </div>
+
+            <!-- Overlay Toggle -->
+            <div>
+                <h3 class="font-bold text-gray-800 mb-2">Overlays</h3>
+                
+                <!-- US States -->
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="wms" class="h-4 w-4 text-blue-600 rounded" checked>
+                    <label for="wms" class="text-sm text-gray-700">US States (WMS)</label>
+                </div>
+                <input type="range" id="wms-opacity" min="0" max="100" value="100" class="w-full h-1 my-1 accent-blue-600">
+                
+                <!-- Elevation -->
+                <div class="flex items-center space-x-2 mt-2">
+                    <input type="checkbox" id="elevation" class="h-4 w-4 text-blue-600 rounded">
+                    <label for="elevation" class="text-sm text-gray-700">Elevation (Hillshade)</label>
+                </div>
+                <input type="range" id="elevation-opacity" min="0" max="100" value="60" class="w-full h-1 my-1 accent-blue-600">
+
+                <!-- Land Use -->
+                <div class="flex items-center space-x-2 mt-2">
+                    <input type="checkbox" id="landuse" class="h-4 w-4 text-blue-600 rounded">
+                    <label for="landuse" class="text-sm text-gray-700">Land Use (NALCMS 2015)</label>
+                </div>
+                <input type="range" id="landuse-opacity" min="0" max="100" value="100" class="w-full h-1 my-1 accent-blue-600">
+
+                <!-- Population -->
+                <div class="flex items-center space-x-2 mt-2">
+                    <input type="checkbox" id="population" class="h-4 w-4 text-blue-600 rounded">
+                    <label for="population" class="text-sm text-gray-700">Population Density (2020)</label>
+                </div>
+                <input type="range" id="population-opacity" min="0" max="100" value="100" class="w-full h-1 my-1 accent-blue-600">
+            </div>
+        </div>
+    </div>
+
+    <!-- OpenLayers JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
+
+    <script type="module">
+        // Wait for the DOM to be ready
+        window.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. Define Layers ---
+
+            // Basemap Layer 1: OpenStreetMap
+            const osmLayer = new ol.layer.Tile({
+                source: new ol.source.OSM(),
+                visible: true, // Visible by default
+            });
+
+            // Basemap Layer 2: ESRI World Imagery
+            const esriLayer = new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    attributions: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                    maxZoom: 19
+                }),
+                visible: false, // Hidden by default
+            });
+
+            // Overlay Layer: WMS for US States
+            const wmsLayer = new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                    url: 'https://ahocevar.com/geoserver/wms',
+                    params: {
+                        'LAYERS': 'topp:states', // The specific WMS layer to request
+                    },
+                    serverType: 'geoserver',
+                    attributions: 'US States (WMS) &copy; ahocevar.com',
+                }),
+                visible: true, // Visible by default
+            });
+
+            // --- New Layers ---
+
+            // Elevation Layer: Terrestris Hillshade
+            const elevationLayer = new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                    url: 'https://ows.terrestris.de/osm/service',
+                    params: {
+                        'LAYERS': 'SRTM30-Hillshade',
+                    },
+                    serverType: 'geoserver',
+                    attributions: 'Hillshade &copy; terrestris.de',
+                }),
+                visible: false, // Off by default
+                opacity: 0.6, // Make it semi-transparent by default
+            });
+
+            // Land Use Layer: NALCMS 2015
+            const landUseLayer = new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                    url: 'https://maps.geoplatform.gov/arcgis/services/NALCMS/NALCMS_Land_Cover_2015/MapServer/WmsServer', // Fixed URL
+                    params: {
+                        'LAYERS': '3', // Layer ID for 2015 Land Cover
+                    },
+                    serverType: 'mapserver',
+                    attributions: 'NALCMS Land Cover &copy; geoplatform.gov',
+                }),
+                visible: false, // Off by default
+            });
+
+            // Population Layer: SEDAC Population Density 2020
+            const populationLayer = new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                    url: 'https://sedac.ciesin.columbia.edu/geoserver/wms',
+                    params: {
+                        'LAYERS': 'gpw-v4:gpw-v4-population-density_2020',
+                    },
+                    serverType: 'geoserver',
+                    attributions: 'Population Density &copy; SEDAC',
+                    transition: 0, // Helps with slow WMS servers
+                }),
+                visible: false, // Off by default
+            });
+
+
+            // --- 2. Define View ---
+
+            // Center on the continental US
+            // Coordinates are in Lon/Lat (EPSG:4326)
+            const centerLonLat = [-98.58, 39.82];
+            
+            // Transform the center to the view's projection (Web Mercator, EPSG:3857)
+            const centerMercator = ol.proj.fromLonLat(centerLonLat);
+
+            const view = new ol.View({
+                center: centerMercator,
+                zoom: 5, // An appropriate zoom level for the continental US
+            });
+
+            // --- 3. Create the Map ---
+            
+            const map = new ol.Map({
+                target: 'map', // The ID of the div to render the map in
+                layers: [
+                    // Basemaps are added first (bottom layers)
+                    osmLayer,
+                    esriLayer,
+                    // Overlays are added on top
+                    wmsLayer,
+                    elevationLayer,
+                    landUseLayer,
+                    populationLayer
+                ],
+                view: view,
+            });
+
+            // --- 4. Add Event Listeners for Controls ---
+
+            // WMS Layer Toggle
+            const wmsCheckbox = document.getElementById('wms');
+            wmsCheckbox.addEventListener('change', (event) => {
+                wmsLayer.setVisible(event.target.checked);
+            });
+            // Opacity Slider
+            document.getElementById('wms-opacity').addEventListener('input', (event) => {
+                wmsLayer.setOpacity(event.target.value / 100);
+            });
+
+
+            // New Layer Toggles
+            document.getElementById('elevation').addEventListener('change', (event) => {
+                elevationLayer.setVisible(event.target.checked);
+            });
+            document.getElementById('elevation-opacity').addEventListener('input', (event) => {
+                elevationLayer.setOpacity(event.target.value / 100);
+            });
+            
+            document.getElementById('landuse').addEventListener('change', (event) => {
+                landUseLayer.setVisible(event.target.checked);
+            });
+            document.getElementById('landuse-opacity').addEventListener('input', (event) => {
+                landUseLayer.setOpacity(event.target.value / 100);
+            });
+            
+            document.getElementById('population').addEventListener('change', (event) => {
+                populationLayer.setVisible(event.target.checked);
+            });
+            document.getElementById('population-opacity').addEventListener('input', (event) => {
+                populationLayer.setOpacity(event.target.value / 100);
+            });
+
+            // Basemap Radio Buttons
+            const basemapRadios = document.querySelectorAll('input[name="basemap"]');
+            basemapRadios.forEach(radio => {
+                radio.addEventListener('change', (event) => {
+                    const basemapValue = event.target.value;
+                    // When a radio button changes, update the visibility of *both* basemap layers
+                    osmLayer.setVisible(basemapValue === 'osm');
+                    esriLayer.setVisible(basemapValue === 'esri');
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>
