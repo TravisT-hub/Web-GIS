@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OpenLayers Map with Thematic Layers</title>
+  <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css" />
+  <style>
+    body { margin: 0; }
+    #map { width: 100%; height: 90vh; }
+    #controls {
+      padding: 10px;
+      background: #f0f0f0;
+      font-family: sans-serif;
+    }
+    label { margin-right: 15px; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <strong>Basemap:</strong>
+    <label><input type="radio" name="basemap" value="osm" checked> OSM</label>
+    <label><input type="radio" name="basemap" value="esri"> ESRI Imagery</label>
+    <br><strong>Overlay Layers:</strong>
+    <label><input type="checkbox" id="wmsToggle" checked> WMS States</label>
+    <label><input type="checkbox" id="elevationToggle"> Elevation</label>
+    <label><input type="checkbox" id="landuseToggle"> Land Use</label>
+    <label><input type="checkbox" id="populationToggle"> Population</label>
+  </div>
+  <div id="map"></div>
+
+  <script>
+    // Base layers
+    const osmLayer = new ol.layer.Tile({
+      source: new ol.source.OSM(),
+      visible: true
+    });
+
+    const esriLayer = new ol.layer.Tile({
+      source: new ol.source.XYZ({
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      }),
+      visible: false
+    });
+
+    // WMS States layer
+    const wmsLayer = new ol.layer.Image({
+      source: new ol.source.ImageWMS({
+        url: 'https://ahocevar.com/geoserver/wms',
+        params: {
+          'LAYERS': 'topp:states',
+          'VERSION': '1.1.1',
+          'FORMAT': 'image/png',
+          'SRS': 'EPSG:4326'
+        },
+        ratio: 1,
+        serverType: 'geoserver',
+        crossOrigin: 'anonymous'
+      }),
+      visible: true
+    });
+
+    // Elevation layer (SRTM30-Colored)
+    const elevationLayer = new ol.layer.Tile({
+      source: new ol.source.TileWMS({
+        url: 'https://ows.mundialis.de/services/service?',
+        params: {
+          'LAYERS': 'SRTM30-Colored',
+          'TILED': true,
+          'VERSION': '1.3.0',
+          'FORMAT': 'image/png',
+          'CRS': 'EPSG:4326'
+        },
+        serverType: 'geoserver',
+        crossOrigin: 'anonymous'
+      }),
+      visible: false
+    });
+
+    // Land Use layer (CORINE - Europe only)
+    const landuseLayer = new ol.layer.Tile({
+      source: new ol.source.TileWMS({
+        url: 'https://ows.mundialis.de/services/service?',
+        params: {
+          'LAYERS': 'CORINE',
+          'TILED': true,
+          'VERSION': '1.3.0',
+          'FORMAT': 'image/png',
+          'CRS': 'EPSG:4326'
+        },
+        serverType: 'geoserver',
+        crossOrigin: 'anonymous'
+      }),
+      visible: false
+    });
+
+    // Population layer (GPW v4)
+    const populationLayer = new ol.layer.Tile({
+      source: new ol.source.TileWMS({
+        url: 'https://sedac.ciesin.columbia.edu/geoserver/wms',
+        params: {
+          'LAYERS': 'gpw-v4:gpw-v4-population-density_2020',
+          'TILED': true,
+          'VERSION': '1.1.1',
+          'SRS': 'EPSG:4326',
+          'FORMAT': 'image/png'
+        },
+        serverType: 'geoserver',
+        crossOrigin: 'anonymous'
+      }),
+      visible: false
+    });
+
+    // Map setup centered on continental US
+    const map = new ol.Map({
+      target: 'map',
+      layers: [
+        osmLayer,
+        esriLayer,
+        wmsLayer,
+        elevationLayer,
+        landuseLayer,
+        populationLayer
+      ],
+      view: new ol.View({
+        center: ol.proj.fromLonLat([-98.5, 39.8]), // Continental US center
+        zoom: 4
+      })
+    });
+
+    // Basemap switcher
+    document.querySelectorAll('input[name="basemap"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        osmLayer.setVisible(radio.value === 'osm');
+        esriLayer.setVisible(radio.value === 'esri');
+      });
+    });
+
+    // Overlay toggles
+    document.getElementById('wmsToggle').addEventListener('change', e => {
+      wmsLayer.setVisible(e.target.checked);
+    });
+
+    document.getElementById('elevationToggle').addEventListener('change', e => {
+      elevationLayer.setVisible(e.target.checked);
+    });
+
+    document.getElementById('landuseToggle').addEventListener('change', e => {
+      landuseLayer.setVisible(e.target.checked);
+    });
+
+    document.getElementById('populationToggle').addEventListener('change', e => {
+      populationLayer.setVisible(e.target.checked);
+    });
+  </script>
+</body>
+</html>
