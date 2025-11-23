@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab 5 Complete Collection</title>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.6.1/ol.css">
+  <script src="https://cdn.jsdelivr.net/npm/ol@v10.6.1/dist/ol.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* Global Page Styles */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f4f4f4;
+      /* Ensure scrolling works */
+      height: auto; 
+      overflow-y: auto; 
+    }
+    
+    h1 {
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      color: #333;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+      width: 80%;
+    }
+    
+    /* Map Container Style */
+    .map-section {
+      width: 90%;
+      height: 600px; /* Fixed height for all maps */
+      margin-bottom: 50px;
+      position: relative; /* Important for absolute controls inside */
+      background: white;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden; /* Keeps content inside the rounded corners */
+    }
+
+    .map-label {
+      text-align: center;
+      padding: 10px;
+      background: #eee;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+    }
+
+    /* Standard Controls (for Parts 1, 2, 4) */
+    .std-controls {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      z-index: 1000;
+      max-width: 200px;
+      font-size: 14px;
+    }
+    .std-controls label { display: block; margin: 5px 0; cursor: pointer; }
+    
+    /* Tailwind specific adjustments for Part 3 to fit in the box */
+    #controls-part3 {
+        position: absolute; 
+        top: 1rem; 
+        left: 1rem; 
+        z-index: 10; 
+        background-color: white; 
+        padding: 1rem; 
+        border-radius: 0.5rem; 
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+        max-width: 20rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Part 1: Comparison of Leaflet and OpenLayers</h1>
+
+  <div class="map-section">
+    <div class="map-label">Leaflet Implementation</div>
+    <div id="mapLeaflet" style="width:100%; height:100%;"></div>
+    <div class="std-controls">
+      <strong>Basemaps</strong>
+      <label><input type="radio" name="basemapLeaflet" value="osm" checked> OSM</label>
+      <label><input type="radio" name="basemapLeaflet" value="esri"> ESRI</label>
+      <strong>Overlay</strong>
+      <label><input type="checkbox" id="wmsLeafletToggle" checked> WMS Layer</label>
+    </div>
+  </div>
+
+  <div class="map-section">
+    <div class="map-label">OpenLayers Implementation</div>
+    <div id="mapOL" style="width:100%; height:100%;"></div>
+    <div class="std-controls">
+      <strong>Basemaps</strong>
+      <label><input type="radio" name="basemapOL" value="osm" checked> OSM</label>
+      <label><input type="radio" name="basemapOL" value="esri"> ESRI</label>
+      <strong>Overlay</strong>
+      <label><input type="checkbox" id="wmsOLToggle" checked> WMS Layer</label>
+    </div>
+  </div>
+
+
+  <h1>Part 2: Leaflet with Multiple WMS Layers</h1>
+
+  <div class="map-section">
+    <div id="mapAdvanced" style="width:100%; height:100%;"></div>
+    <div class="std-controls">
+      <strong>Basemaps:</strong>
+      <label><input type="radio" name="basemapAdv" value="osm" checked> OSM</label>
+      <label><input type="radio" name="basemapAdv" value="esri"> ESRI</label>
+      <strong>Layers:</strong>
+      <label><input type="checkbox" id="wmsToggleAdv" checked> States</label>
+      <label><input type="checkbox" id="elevationToggleAdv" checked> Elevation</label>
+      <label><input type="checkbox" id="landUseToggleAdv" checked> Land Use</label>
+      <label><input type="checkbox" id="popToggleAdv" checked> Population</label>
+    </div>
+  </div>
+
+
+  <h1>Part 3: OpenLayers Advanced (Tailwind UI)</h1>
+
+  <div class="map-section">
+    <div id="mapOLTailwind" style="width:100%; height:100%;"></div>
+    
+    <div id="controls-part3">
+      <div class="grid gap-4">
+        <div>
+          <h3 class="font-bold text-gray-800 mb-2">Basemap</h3>
+          <div class="flex items-center space-x-2">
+            <input type="radio" name="basemapOL3" value="osm" checked class="h-4 w-4 text-blue-600">
+            <span class="text-sm text-gray-700">OpenStreetMap</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="radio" name="basemapOL3" value="esri" class="h-4 w-4 text-blue-600">
+            <span class="text-sm text-gray-700">ESRI Imagery</span>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-800 mb-2">Overlays</h3>
+          <div class="flex items-center space-x-2">
+            <input type="checkbox" id="wmsOL3" checked class="h-4 w-4 text-blue-600 rounded">
+            <span class="text-sm text-gray-700">US States</span>
+          </div>
+          <input type="range" id="opacityOL3-wms" min="0" max="100" value="100" class="w-full h-1 my-1 accent-blue-600">
+
+          <div class="flex items-center space-x-2 mt-2">
+            <input type="checkbox" id="elevOL3" class="h-4 w-4 text-blue-600 rounded">
+            <span class="text-sm text-gray-700">Elevation</span>
+          </div>
+          <input type="range" id="opacityOL3-elev" min="0" max="100" value="60" class="w-full h-1 my-1 accent-blue-600">
+          
+          <div class="flex items-center space-x-2 mt-2">
+            <input type="checkbox" id="popOL3" class="h-4 w-4 text-blue-600 rounded">
+            <span class="text-sm text-gray-700">Population</span>
+          </div>
+          <input type="range" id="opacityOL3-pop" min="0" max="100" value="100" class="w-full h-1 my-1 accent-blue-600">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <h1>Part 4: OpenLayers Thematic Layers</h1>
+
+  <div class="map-section">
+    <div id="mapOLThematic" style="width:100%; height:100%;"></div>
+    <div class="std-controls" style="left: 10px; right: auto;"> <strong>Basemap:</strong>
+      <label><input type="radio" name="basemapOL4" value="osm" checked> OSM</label>
+      <label><input type="radio" name="basemapOL4" value="esri"> ESRI Imagery</label>
+      <br><strong>Overlay Layers:</strong>
+      <label><input type="checkbox" id="wmsToggleOL4" checked> WMS States</label>
+      <label><input type="checkbox" id="elevationToggleOL4"> Elevation</label>
+      <label><input type="checkbox" id="landuseToggleOL4"> Land Use (Corine)</label>
+      <label><input type="checkbox" id="populationToggleOL4"> Population</label>
+    </div>
+  </div>
+
+  <script>
+    /* --------------------------------------------------------------------------
+       SCRIPT FOR PART 1: LEAFLET & OPENLAYERS COMPARISON
+    -------------------------------------------------------------------------- */
+    
+    // --- Leaflet Comparison ---
+    const mapLeaflet = L.map('mapLeaflet', { center: [39.5, -98.5], zoom: 4 });
+    const osmLeaflet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(mapLeaflet);
+    const esriLeaflet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles © Esri' });
+    const wmsLeaflet = L.tileLayer.wms('https://ahocevar.com/geoserver/wms', { layers: 'topp:states', format: 'image/png', transparent: true }).addTo(mapLeaflet);
+
+    document.querySelectorAll('input[name="basemapLeaflet"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if (e.target.value === 'osm') { mapLeaflet.addLayer(osmLeaflet); mapLeaflet.removeLayer(esriLeaflet); } 
+        else { mapLeaflet.addLayer(esriLeaflet); mapLeaflet.removeLayer(osmLeaflet); }
+        if (mapLeaflet.hasLayer(wmsLeaflet)) wmsLeaflet.bringToFront();
+      });
+    });
+    document.getElementById('wmsLeafletToggle').addEventListener('change', (e) => {
+      e.target.checked ? mapLeaflet.addLayer(wmsLeaflet) : mapLeaflet.removeLayer(wmsLeaflet);
+    });
+
+    // --- OpenLayers Comparison ---
+    const osmOL1 = new ol.layer.Tile({ source: new ol.source.OSM(), visible: true });
+    const esriOL1 = new ol.layer.Tile({ source: new ol.source.XYZ({ url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' }), visible: false });
+    const wmsOL1 = new ol.layer.Tile({ source: new ol.source.TileWMS({ url: 'https://ahocevar.com/geoserver/wms', params: { 'LAYERS': 'topp:states', 'TILED': true }, serverType: 'geoserver', crossOrigin: 'anonymous' }), visible: true });
+    
+    const mapOL1 = new ol.Map({
+      target: 'mapOL',
+      layers: [osmOL1, esriOL1, wmsOL1],
+      view: new ol.View({ center: ol.proj.fromLonLat([-98.5, 39.5]), zoom: 4 })
+    });
+
+    document.querySelectorAll('input[name="basemapOL"]').forEach(radio => {
+      radio.addEventListener('change', (e) => { osmOL1.setVisible(e.target.value === 'osm'); esriOL1.setVisible(e.target.value === 'esri'); });
+    });
+    document.getElementById('wmsOLToggle').addEventListener('change', (e) => wmsOL1.setVisible(e.target.checked));
+
+
+    /* --------------------------------------------------------------------------
+       SCRIPT FOR PART 2: ADVANCED LEAFLET
+    -------------------------------------------------------------------------- */
+    const osmAdv = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' });
+    const esriAdv = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri' });
+    
+    const wmsStatesAdv = L.tileLayer.wms('https://ahocevar.com/geoserver/wms', { layers: 'topp:states', format: 'image/png', transparent: true });
+    const elevationAdv = L.tileLayer.wms('https://ows.terrestris.de/osm/service?', { layers: 'SRTM30-Colored', format: 'image/png', transparent: true });
+    const landuseAdv = L.tileLayer.wms('https://basemap.nationalmap.gov/arcgis/services/NLCD_Land_Cover/MapServer/WMSServer', { layers: 'NLCD_2019_Land_Cover_L48', format: 'image/png', transparent: true, version: '1.3.0' });
+    const populationAdv = L.tileLayer.wms('https://sedac.ciesin.columbia.edu/geoserver/wms', { layers: 'gpw-v4:gpw-v4-population-density_2020', format: 'image/png', transparent: true });
+
+    const mapAdvanced = L.map('mapAdvanced', { center: [39.5, -98.5], zoom: 4, layers: [osmAdv, wmsStatesAdv, elevationAdv, landuseAdv, populationAdv] });
+
+    document.querySelectorAll('input[name="basemapAdv"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'osm') { mapAdvanced.addLayer(osmAdv); mapAdvanced.removeLayer(esriAdv); } 
+        else { mapAdvanced.addLayer(esriAdv); mapAdvanced.removeLayer(osmAdv); }
+      });
+    });
+    document.getElementById('wmsToggleAdv').addEventListener('change', e => e.target.checked ? mapAdvanced.addLayer(wmsStatesAdv) : mapAdvanced.removeLayer(wmsStatesAdv));
+    document.getElementById('elevationToggleAdv').addEventListener('change', e => e.target.checked ? mapAdvanced.addLayer(elevationAdv) : mapAdvanced.removeLayer(elevationAdv));
+    document.getElementById('landUseToggleAdv').addEventListener('change', e => e.target.checked ? mapAdvanced.addLayer(landuseAdv) : mapAdvanced.removeLayer(landuseAdv));
+    document.getElementById('popToggleAdv').addEventListener('change', e => e.target.checked ? mapAdvanced.addLayer(populationAdv) : mapAdvanced.removeLayer(populationAdv));
+
+
+    /* --------------------------------------------------------------------------
+       SCRIPT FOR PART 3: ADVANCED OPENLAYERS (TAILWIND UI)
+    -------------------------------------------------------------------------- */
+    {
+      // Using Block Scope to avoid variable conflicts with previous OL maps
+      const osmLayer = new ol.layer.Tile({ source: new ol.source.OSM(), visible: true });
+      const esriLayer = new ol.layer.Tile({ source: new ol.source.XYZ({ url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', maxZoom: 19 }), visible: false });
+
+      const wmsLayer = new ol.layer.Tile({ source: new ol.source.TileWMS({ url: 'https://ahocevar.com/geoserver/wms', params: { 'LAYERS': 'topp:states' }, serverType: 'geoserver' }), visible: true });
+      const elevLayer = new ol.layer.Tile({ source: new ol.source.TileWMS({ url: 'https://ows.terrestris.de/osm/service', params: { 'LAYERS': 'SRTM30-Hillshade' }, serverType: 'geoserver' }), visible: false, opacity: 0.6 });
+      const popLayer = new ol.layer.Tile({ source: new ol.source.TileWMS({ url: 'https://sedac.ciesin.columbia.edu/geoserver/wms', params: { 'LAYERS': 'gpw-v4:gpw-v4-population-density_2020' }, serverType: 'geoserver', transition: 0 }), visible: false });
+
+      const map3 = new ol.Map({
+        target: 'mapOLTailwind',
+        layers: [osmLayer, esriLayer, wmsLayer, elevLayer, popLayer],
+        view: new ol.View({ center: ol.proj.fromLonLat([-98.58, 39.82]), zoom: 5 })
+      });
+
+      // Controls
+      document.querySelectorAll('input[name="basemapOL3"]').forEach(radio => {
+        radio.addEventListener('change', e => { osmLayer.setVisible(e.target.value === 'osm'); esriLayer.setVisible(e.target.value === 'esri'); });
+      });
+      document.getElementById('wmsOL3').addEventListener('change', e => wmsLayer.setVisible(e.target.checked));
+      document.getElementById('opacityOL3-wms').addEventListener('input', e => wmsLayer.setOpacity(e.target.value / 100));
+      
+      document.getElementById('elevOL3').addEventListener('change', e => elevLayer.setVisible(e.target.checked));
+      document.getElementById('opacityOL3-elev').addEventListener('input', e => elevLayer.setOpacity(e.target.value / 100));
+      
+      document.getElementById('popOL3').addEventListener('change', e => popLayer.setVisible(e.target.checked));
+      document.getElementById('opacityOL3-pop').addEventListener('input', e => popLayer.setOpacity(e.target.value / 100));
+    }
+
+
+    /* --------------------------------------------------------------------------
+       SCRIPT FOR PART 4: OPENLAYERS THEMATIC (SIMPLE UI)
+    -------------------------------------------------------------------------- */
+    {
+      const osmLayer = new ol.layer.Tile({ source: new ol.source.OSM(), visible: true });
+      const esriLayer = new ol.layer.Tile({ source: new ol.source.XYZ({ url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' }), visible: false });
+
+      const wmsLayer = new ol.layer.Image({ source: new ol.source.ImageWMS({ url: 'https://ahocevar.com/geoserver/wms', params: { 'LAYERS': 'topp:states' }, serverType: 'geoserver', crossOrigin: 'anonymous' }), visible: true });
+      
+      const elevLayer = new ol.layer.Tile({ source: new ol.source.TileWMS({ url: 'https://ows.mundialis.de/services/service?', params: { 'LAYERS': 'SRTM30-Colored', 'TILED': true }, serverType: 'geoserver', crossOrigin: 'anonymous' }), visible: false });
+      
+      const landuseLayer = new ol.layer.Tile({ source: new ol.source.TileWMS({ url: 'https://ows.mundialis.de/services/service?', params: { 'LAYERS': 'CORINE', 'TILED': true }, serverType: 'geoserver', crossOrigin: 'anonymous' }), visible: false });
+      
+      const popLayer = new ol.layer.Tile({ source: new ol.source.TileWMS({ url: 'https://sedac.ciesin.columbia.edu/geoserver/wms', params: { 'LAYERS': 'gpw-v4:gpw-v4-population-density_2020', 'TILED': true }, serverType: 'geoserver', crossOrigin: 'anonymous' }), visible: false });
+
+      const map4 = new ol.Map({
+        target: 'mapOLThematic',
+        layers: [osmLayer, esriLayer, wmsLayer, elevLayer, landuseLayer, popLayer],
+        view: new ol.View({ center: ol.proj.fromLonLat([-98.5, 39.8]), zoom: 4 })
+      });
+
+      document.querySelectorAll('input[name="basemapOL4"]').forEach(radio => {
+        radio.addEventListener('change', () => { osmLayer.setVisible(radio.value === 'osm'); esriLayer.setVisible(radio.value === 'esri'); });
+      });
+      document.getElementById('wmsToggleOL4').addEventListener('change', e => wmsLayer.setVisible(e.target.checked));
+      document.getElementById('elevationToggleOL4').addEventListener('change', e => elevLayer.setVisible(e.target.checked));
+      document.getElementById('landuseToggleOL4').addEventListener('change', e => landuseLayer.setVisible(e.target.checked));
+      document.getElementById('populationToggleOL4').addEventListener('change', e => popLayer.setVisible(e.target.checked));
+    }
+  </script>
+</body>
+</html>
