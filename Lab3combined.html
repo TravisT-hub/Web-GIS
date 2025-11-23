@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Lab 3 Combined: Q1-Q4</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/ol@v10.6.1/dist/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.6.1/ol.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol-layerswitcher@4.1.2/dist/ol-layerswitcher.css" />
+    <script src="https://cdn.jsdelivr.net/npm/ol-layerswitcher@4.1.2/dist/ol-layerswitcher.js"></script>
+
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
+      
+      /* Style for all maps */
+      .map-container { 
+        width: 90%; 
+        height: 600px; 
+        margin: 20px auto; 
+        border: 2px solid #444; 
+        background-color: #f5f5f5; /* Light gray background while loading */
+      }
+      
+      hr { 
+        margin: 50px 0; 
+        border: 0; 
+        border-top: 3px solid #ccc; 
+      }
+      
+      h1, h2 { margin-top: 0; }
+    </style>
+  </head>
+
+  <body>
+    
+    <h2>Questions 1 and 2: OSM and Azure Maps for North Carolina</h2>
+    <h4>Travis Toomey</h4>
+    <div id="map1" class="map-container"></div>
+
+    <hr>
+    <h1>Question 3: North Carolina with WMS Overlay</h1>
+    <h4>By- Travis Toomey</h4>
+    <div id="map2" class="map-container"></div>
+
+    <hr>
+    <h1>Question 4: Tasmania Web GIS</h1>
+    <h4>By- Travis Toomey</h4>
+    <div id="map3" class="map-container"></div>
+
+
+    <script>
+      // GLOBAL AZURE KEY (Used for Map 1 and Map 3)
+      const AZURE_KEY = '2BFovPB7m7VyOugD5PdsMA5RQQCgAeEbdQmd3VfXQ4mmRD3Vn5e1JQQJ99BKACYeBjFirIi5AAAgAZMP4I0y';
+
+      /* ============================================================== 
+         SCRIPT FOR MAP 1 (Q1 + Q2) 
+         ============================================================== */
+      
+      const OSM1 = new ol.layer.Tile({
+        title: "OSM",
+        type: "base",
+        visible: true,
+        source: new ol.source.OSM(),
+      });
+
+      const azureRoad1 = new ol.layer.Tile({
+        title: "Road",
+        type: "base",
+        visible: false,
+        source: new ol.source.XYZ({
+          url: `https://atlas.microsoft.com/map/tile?api-version=2022-08-01&tilesetId=microsoft.base.road&zoom={z}&x={x}&y={y}&subscription-key=${AZURE_KEY}`,
+          crossOrigin: "anonymous",
+        }),
+      });
+
+      const azureDark1 = new ol.layer.Tile({
+        title: "Dark Gray",
+        type: "base",
+        visible: false,
+        source: new ol.source.XYZ({
+          url: `https://atlas.microsoft.com/map/tile?api-version=2022-08-01&tilesetId=microsoft.base.darkgrey&zoom={z}&x={x}&y={y}&subscription-key=${AZURE_KEY}`,
+          crossOrigin: "anonymous",
+        }),
+      });
+
+      const azureImagery1 = new ol.layer.Tile({
+        title: "Imagery",
+        type: "base",
+        visible: false,
+        source: new ol.source.XYZ({
+          url: `https://atlas.microsoft.com/map/tile?api-version=2022-08-01&tilesetId=microsoft.imagery&zoom={z}&x={x}&y={y}&subscription-key=${AZURE_KEY}`,
+          crossOrigin: "anonymous",
+        }),
+      });
+
+      const azureTerra1 = new ol.layer.Tile({
+        title: "Terra",
+        type: "base",
+        visible: false,
+        source: new ol.source.XYZ({
+          url: `https://atlas.microsoft.com/map/tile?api-version=2022-08-01&tilesetId=microsoft.terra.main&zoom={z}&x={x}&y={y}&subscription-key=${AZURE_KEY}`,
+          crossOrigin: "anonymous",
+        }),
+      });
+
+      const baseGroup1 = new ol.layer.Group({
+        title: "Base Maps",
+        layers: [OSM1, azureRoad1, azureDark1, azureImagery1, azureTerra1],
+      });
+
+      const map1 = new ol.Map({
+        target: "map1",
+        layers: [baseGroup1],
+        view: new ol.View({
+          projection: "EPSG:3857",
+          center: ol.proj.fromLonLat([-79.0193, 35.7596]),
+          zoom: 8,
+        }),
+      });
+
+      const ncExtent4326_1 = [-84.3219, 33.8423, -75.4001, 36.5880];
+      const ncExtent3857_1 = ol.proj.transformExtent(ncExtent4326_1, "EPSG:4326", "EPSG:3857");
+      map1.getView().fit(ncExtent3857_1, { size: map1.getSize(), padding: [20, 20, 20, 20], duration: 300 });
+
+      map1.addControl(new ol.control.LayerSwitcher({ tipLabel: "Legend" }));
+
+
+      /* ============================================================== 
+         SCRIPT FOR MAP 2 (Q3) 
+         ============================================================== */
+
+      const OSM2 = new ol.layer.Tile({
+        title: "OpenStreetMap",
+        type: "base",
+        visible: true,
+        source: new ol.source.OSM(),
+      });
+
+      const wmsLayer2 = new ol.layer.Tile({
+        title: "WMS: US States (topp:states)",
+        visible: true,
+        source: new ol.source.TileWMS({
+          url: "https://ahocevar.com/geoserver/wms",
+          params: {
+            LAYERS: "topp:states",
+            TILED: true,
+            FORMAT: "image/png",
+            TRANSPARENT: true,
+          },
+          serverType: "geoserver",
+          transition: 0,
+        }),
+      });
+
+      const baseGroup2 = new ol.layer.Group({
+        title: "Base Maps",
+        layers: [OSM2],
+      });
+
+      const overlayGroup2 = new ol.layer.Group({
+        title: "Overlay Layers",
+        layers: [wmsLayer2],
+      });
+
+      const map2 = new ol.Map({
+        target: "map2",
+        layers: [baseGroup2, overlayGroup2],
+        view: new ol.View({
+          projection: "EPSG:3857",
+          center: ol.proj.fromLonLat([-79.0193, 35.7596]),
+          zoom: 7,
+        }),
+      });
+
+      const ncExtent4326_2 = [-84.3219, 33.8423, -75.4001, 36.5880];
+      const ncExtent3857_2 = ol.proj.transformExtent(ncExtent4326_2, "EPSG:4326", "EPSG:3857");
+      map2.getView().fit(ncExtent3857_2, { size: map2.getSize(), padding: [20, 20, 20, 20], duration: 300 });
+      
+      map2.addControl(new ol.control.LayerSwitcher({ tipLabel: "Legend" }));
+
+
+      /* ============================================================== 
+         SCRIPT FOR MAP 3 (Q4 - Tasmania) 
+         ============================================================== */
+
+      const wmsUrlTas = "https://data.stategrowth.tas.gov.au/geoserver/ows";
+      const tasCenter = ol.proj.fromLonLat([146.8, -42.0]);
+
+      const azureRoadTas = new ol.layer.Tile({
+        title: "Hybrid Base",
+        type: "base",
+        visible: true,
+        source: new ol.source.XYZ({
+          url: `https://atlas.microsoft.com/map/tile?api-version=2022-08-01&tilesetId=microsoft.imagery.hybrid&zoom={z}&x={x}&y={y}&subscription-key=${AZURE_KEY}`,
+          crossOrigin: "anonymous",
+          maxZoom: 19
+        })
+      });
+
+      const carriageways = new ol.layer.Tile({
+        title: "Carriageways",
+        visible: true,
+        source: new ol.source.TileWMS({
+          url: wmsUrlTas,
+          params: {
+            LAYERS: "ssg:GEO_CARRIAGEWAY",
+            FORMAT: "image/png",
+            TRANSPARENT: true,
+            VERSION: "1.3.0",
+            CRS: "CRS:84"
+          },
+          serverType: "geoserver",
+          crossOrigin: "anonymous"
+        }),
+      });
+
+      const cadastre = new ol.layer.Tile({
+        title: "Cadastre Parcels",
+        visible: false,
+        source: new ol.source.TileWMS({
+          url: wmsUrlTas,
+          params: {
+            LAYERS: "pam:GEO_CADASTRE",
+            FORMAT: "image/png",
+            TRANSPARENT: true,
+            VERSION: "1.3.0",
+            CRS: "CRS:84"
+          },
+          serverType: "geoserver",
+          crossOrigin: "anonymous"
+        }),
+      });
+
+      const busTrips = new ol.layer.Tile({
+        title: "Bus Trips",
+        visible: false,
+        source: new ol.source.TileWMS({
+          url: wmsUrlTas,
+          params: {
+            LAYERS: "ssg:GEO_BRM_TRIP",
+            FORMAT: "image/png",
+            TRANSPARENT: true,
+            VERSION: "1.3.0",
+            CRS: "CRS:84"
+          },
+          serverType: "geoserver",
+          crossOrigin: "anonymous"
+        }),
+      });
+
+      const map3 = new ol.Map({
+        target: "map3",
+        layers: [
+          new ol.layer.Group({ title: "Base Maps", layers: [azureRoadTas] }),
+          new ol.layer.Group({ title: "Tasmania Overlays", layers: [carriageways, cadastre, busTrips] })
+        ],
+        view: new ol.View({
+          center: tasCenter,
+          zoom: 7
+        }),
+      });
+
+      // Add Layer Switcher to Map 3
+      map3.addControl(new ol.control.LayerSwitcher({ tipLabel: "Layers", groupSelectStyle: "children" }));
+
+    </script>
+  </body>
+</html>
